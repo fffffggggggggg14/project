@@ -1,8 +1,8 @@
 from django.shortcuts import render
 
 from rest_framework import generics
-from .models import Todo
-from .serializers import TodoSerializer
+from .models import Todo, Task
+from .serializers import TodoSerializer, TaskSerializer
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
 
@@ -20,6 +20,24 @@ class TodoRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
+
+
+#########################################################################################
+
+class TaskListCreateView(generics.ListCreateAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        todo_id = self.kwargs['todo_id']
+        return Task.objects.filter(todo_id=todo_id)
+
+class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    permission_classes = [IsAuthenticated]
+
 
 ##
 ##
