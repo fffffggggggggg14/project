@@ -22,7 +22,7 @@ class Task(models.Model):
         ]
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=10000)
-    task = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name='todos')
+    todo = models.ForeignKey(Todo, related_name='tasks', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=50, default='new',)
