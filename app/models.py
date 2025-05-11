@@ -2,6 +2,18 @@ from django.db import models
 from PIL import Image
 import os
 
+
+class Todo(models.Model):
+    title = models.CharField(max_length=200)
+    is_completed = models.BooleanField(default=False)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.title
+    
+
+
 class Task(models.Model):
     choices = [
             ('new', 'new'),
@@ -10,6 +22,7 @@ class Task(models.Model):
         ]
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=10000)
+    task = models.ForeignKey(Todo, on_delete=models.CASCADE, related_name='todos')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     status = models.CharField(max_length=50, default='new',)
@@ -29,16 +42,3 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
-
-class Todo(models.Model):
-    title = models.CharField(max_length=200)
-    task = models.ForeignKey(Task, on_delete=models.CASCADE, related_name='todos')
-    is_completed = models.BooleanField(default=False)
-    created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.title
-    
-
-
