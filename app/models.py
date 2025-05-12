@@ -28,10 +28,9 @@ class Task(models.Model):
         return self.title
 
 class Image(models.Model):
-    task = models.ForeignKey(Task, related_name='images', on_delete=models.CASCADE)
+    task = models.ForeignKey(Task, related_name='images', on_delete=models.CASCADE, blank=True, null=True)
     image = models.ImageField(upload_to='images/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
-    updated_at = models.DateTimeField(auto_now=True)
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -42,7 +41,7 @@ class Image(models.Model):
             webp_path = os.path.splitext(self.image.path)[0] + '.webp'
             img.save(webp_path, 'webp')
             name_without_ext = os.path.splitext(os.path.split(self.image.name)[1])[0]
-            self.image_name = f"{name_without_ext}.webp.{self.image.name.split('.')[-1].lower()}"
+            self.image_name = f"{name_without_ext}.webp"
             self.save(update_fields=['image'])
 
     def __str__(self):
