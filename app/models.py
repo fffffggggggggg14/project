@@ -2,7 +2,6 @@ from django.db import models
 from PIL import Image
 import os
 
-
 class Todo(models.Model):
     title = models.CharField(max_length=200)
     is_completed = models.BooleanField(default=False)
@@ -11,34 +10,40 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
-    
-
 
 class Task(models.Model):
     choices = [
-            ('new', 'new'),
-            ('in_progress', 'in_progress'),
-            ('done', 'done'),
-        ]
+        ('new', 'New'),
+        ('in_progress', 'In progress'),
+        ('done', 'Done'),
+    ]
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=10000)
     todo = models.ForeignKey(Todo, related_name='tasks', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=50, default='new',)
-
-    image = models.ImageField(upload_to='todo_images/', blank=True, null=True)
-    def save(self, *args, **kwargs):
-        super().save(*args, **kwargs)
-        if self.image:
-            image_path = self.image.path
-            img = Image.open(image_path).convert('RGB')
-            webp_path = os.path.splitext(image_path)[0] + '.webp'
-            img.save(webp_path, 'webp')
-            if not self.image.name.endswith('.webp'):
-                os.remove(image_path)
-                self.image.name = os.path.splitext(self.image.name)[0] + '.webp'
-                self.save(update_fields=['image'])
+    status = models.CharField(max_length=50, choices=choices, default='new')
 
     def __str__(self):
         return self.title
+
+class Image(models.Model):
+    task = models.ForeignKey(Task, related_name='images', on_delete=models.CASCADE)
+    image = models.ImageField(upload_to='images/', blank=True, null=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def save(self, *args, **kwargs):
+        super().save(*args, **kwargs)
+        if self.image:
+            img = Image.open(self.image.path)
+            if img.mode != 'RGB':
+                img = img.convert('RGB')
+            webp_path = os.path.splitext(self.image.path)[0] + '.webp'
+            img.save(webp_path, 'webp')
+            name_without_ext = os.path.splitext(os.path.split(self.image.name)[1])[0]
+            self.image_name = f"{name_without_ext}.webp.{self.image.name.split('.')[-1].lower()}"
+            self.save(update_fields=['image'])
+
+    def __str__(self):
+        return self.image.name
