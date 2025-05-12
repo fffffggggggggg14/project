@@ -5,6 +5,9 @@ from .models import Todo, Task
 from .serializers import TodoSerializer, TaskSerializer
 from rest_framework import filters
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.parsers import MultiPartParser, FormParser
+from .models import Image
+from .serializers import ImageSerializer
 
 class TodoListCreateView(generics.ListCreateAPIView):
     permission_classes = [IsAuthenticated]
@@ -39,5 +42,17 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthenticated]
 
 
-##
-##
+##########################################################################################
+
+
+class ImageListView(generics.ListCreateAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+    parser_classes = [MultiPartParser, FormParser]
+
+class ImageRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthenticated]
+    queryset = Image.objects.all()
+    serializer_class = ImageSerializer
+    parser_classes = [MultiPartParser, FormParser]
