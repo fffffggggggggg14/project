@@ -16,11 +16,8 @@ class TaskSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get('request')
         task = Task.objects.create(**validated_data)
-
-        images = request.FILES.getlist('images')
-        for image in images:
+        for image in request.FILES.getlist('images'):
             Image.objects.create(task=task, image=image)
-
         return task
 
     def update(self, instance, validated_data):
@@ -28,11 +25,8 @@ class TaskSerializer(serializers.ModelSerializer):
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
-
-        images = request.FILES.getlist('images')
-        for image in images:
+        for image in request.FILES.getlist('images'):
             Image.objects.create(task=instance, image=image)
-
         return instance
 
 class TodoSerializer(serializers.ModelSerializer):

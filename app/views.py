@@ -1,25 +1,24 @@
 from django.shortcuts import render
-from rest_framework import generics, filters
+# from rest_framework.generics import filters
+from rest_framework import generics
 from .models import Todo, Task, Image
 from .serializers import TodoSerializer, TaskSerializer, ImageSerializer
+from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
 
 class TodoListCreateView(generics.ListCreateAPIView):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
-    permission_classes = [IsAuthenticated]
-    filter_backends = [filters.OrderingFilter, filters.SearchFilter]
     ordering_fields = ['id']
     search_fields = ['title']
 
 class TodoRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
-    permission_classes = [IsAuthenticated]
 
 
-###################################################################################
+#############################################################################################
 
 
 class TaskListCreateView(generics.ListCreateAPIView):
@@ -36,13 +35,15 @@ class TaskListCreateView(generics.ListCreateAPIView):
         serializer.save(todo_id=todo_id)
 
 class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
+    def get_queryset(self):
+        return Task.objects.all()
 
-##########################################################################################
+
+################################################################################################
 
 
 class ImageListView(generics.ListCreateAPIView):
@@ -56,6 +57,5 @@ class ImageRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ImageSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
 
 
