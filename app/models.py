@@ -1,5 +1,5 @@
 from django.db import models
-from PIL import Image
+from PIL import Image as PILImage
 import os
 
 class Todo(models.Model):
@@ -12,11 +12,11 @@ class Todo(models.Model):
         return self.title
 
 class Task(models.Model):
-    choices = [
+    choices = (
         ('new', 'New'),
         ('in_progress', 'In progress'),
         ('done', 'Done'),
-    ]
+    )
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=10000)
     todo = models.ForeignKey(Todo, related_name='tasks', on_delete=models.CASCADE)
@@ -35,13 +35,13 @@ class Image(models.Model):
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
         if self.image:
-            img = Image.open(self.image.path)
+            img = PILImage.open(self.image.path)
             if img.mode != 'RGB':
                 img = img.convert('RGB')
             webp_path = os.path.splitext(self.image.path)[0] + '.webp'
             img.save(webp_path, 'webp')
             name_without_ext = os.path.splitext(os.path.split(self.image.name)[1])[0]
-            self.image_name = f"{name_without_ext}.webp"
+            self.image.name = f"{name_without_ext}.webp"
             self.save(update_fields=['image'])
 
     def __str__(self):
