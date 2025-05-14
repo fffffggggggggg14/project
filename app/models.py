@@ -34,16 +34,22 @@ class Image(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.image and os.path.exists(self.image.path):
-            img = PILImage.open(self.image.path)
-            if img.mode != 'RGB':
-                img = img.convert('RGB')
-            webp_path = os.path.splitext(self.image.path)[0] + '.webp'
-            img.save(webp_path, 'WEBP')
-            name_without_ext = os.path.splitext(os.path.splitext(self.image.name)[0])[0]
-            self.image.name = f'{name_without_ext}.webp'
-            super().save(update_fields=['image'])
+        if self.image and hasattr(self.image, 'path') and os.path.exists(self.image.path):
+            try:
+                img = PILImage.open(self.image.path)
+                if img.mode != 'RGB':
+                    img = img.convert('RGB')
+                webp_path = os.path.splitext(self.image.path)[0] + '.webp'
+                img.save(webp_path, 'WEBP')
+                name_without_ext = os.path.splitext(os.path.splitext(self.image.name)[0])[0]
+                self.image.name = f'{name_without_ext}.webp'
+                super().save(update_fields=['image'])
+            except Exception as e:
+                print(f"Error converting image to WEBP: {e}")
 
     def __str__(self):
-        return self.image.name
+        return self.image.name if self.image else "No Image"
+
+
+
 

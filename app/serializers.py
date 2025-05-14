@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from .models import Todo, Task, Image
+from django.db import transaction
 
 class ImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -13,6 +14,7 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = '__all__'
 
+    @transaction.atomic
     def create(self, validated_data):
         request = self.context.get('request')
         task = Task.objects.create(**validated_data)
@@ -20,6 +22,7 @@ class TaskSerializer(serializers.ModelSerializer):
             Image.objects.create(task=task, image=image)
         return task
 
+    @transaction.atomic
     def update(self, instance, validated_data):
         request = self.context.get('request')
         for attr, value in validated_data.items():
@@ -35,5 +38,3 @@ class TodoSerializer(serializers.ModelSerializer):
     class Meta:
         model = Todo
         fields = '__all__'
-
-
