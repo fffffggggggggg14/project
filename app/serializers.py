@@ -14,13 +14,15 @@ class TaskSerializer(serializers.ModelSerializer):
         model = Task
         fields = '__all__'
 
-    @transaction.atomic
     def create(self, validated_data):
         request = self.context.get('request')
-        task = Task.objects.create(**validated_data)
-        for image in request.FILES.getlist('images'):
-            Image.objects.create(task=task, image=image)
-        return task
+        with transaction.atomic():
+            task = Task.objects.create(**validated_data)
+            if 'condition':
+                transaction.set_rollback(True)
+            for image in request.FILES.getlist('images'):
+                Image.objects.create(task=task, image=image)
+            return task
 
     @transaction.atomic
     def update(self, instance, validated_data):
