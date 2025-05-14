@@ -10,29 +10,38 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
-    
 
-#################################################################################################################
+
+#######################################################################################################
 
 
 class Task(models.Model):
-    choices = (
+    STATUS_CHOICES = (
         ('new', 'New'),
         ('in_progress', 'In progress'),
         ('done', 'Done'),
     )
+    MARITAL_STATUS_CHOICES = (
+        ('single', 'أعزب'),
+        ('married', 'متزوج'),
+    )
+
     title = models.CharField(max_length=200)
     description = models.TextField(max_length=2000, blank=True)
     todo = models.ForeignKey(Todo, related_name='tasks', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-    status = models.CharField(max_length=50, choices=choices, default='new')
+    status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='new')
+    national_id = models.CharField(max_length=16, blank=True, null=True, verbose_name="رقم البطاقة")
+    phone_number = models.CharField(max_length=11, blank=True, null=True, verbose_name="رقم التليفون")
+    marital_status = models.CharField(max_length=10, choices=MARITAL_STATUS_CHOICES, default='single', verbose_name="الحالة الاجتماعية")
 
     def __str__(self):
         return self.title
-    
 
-#################################################################################################################
+
+#######################################################################################################
+
 
 class Image(models.Model):
     task = models.ForeignKey(Task, related_name='images', on_delete=models.CASCADE, blank=True, null=True)
@@ -56,7 +65,3 @@ class Image(models.Model):
 
     def __str__(self):
         return self.image.name if self.image else "No Image"
-
-
-
-
