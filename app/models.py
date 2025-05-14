@@ -10,6 +10,10 @@ class Todo(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+#################################################################################################################
+
 
 class Task(models.Model):
     choices = (
@@ -26,6 +30,9 @@ class Task(models.Model):
 
     def __str__(self):
         return self.title
+    
+
+#################################################################################################################
 
 class Image(models.Model):
     task = models.ForeignKey(Task, related_name='images', on_delete=models.CASCADE, blank=True, null=True)

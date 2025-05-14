@@ -1,11 +1,11 @@
 from django.shortcuts import render
-# from rest_framework.generics import filters
 from rest_framework import generics
 from .models import Todo, Task, Image
 from .serializers import TodoSerializer, TaskSerializer, ImageSerializer
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.parsers import MultiPartParser, FormParser
+from rest_framework.exceptions import ValidationError
 
 class TodoListCreateView(generics.ListCreateAPIView):
     queryset = Todo.objects.all()
@@ -17,9 +17,7 @@ class TodoRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Todo.objects.all()
     serializer_class = TodoSerializer
 
-
-#############################################################################################
-
+#################################################################################################
 
 class TaskListCreateView(generics.ListCreateAPIView):
     serializer_class = TaskSerializer
@@ -32,7 +30,13 @@ class TaskListCreateView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         todo_id = self.kwargs['todo_id']
+        try:
+            todo = Todo.objects.get(id=todo_id)
+        except Todo.DoesNotExist:
+            raise ValidationError({"error": f"Todo with id {todo_id} does not exist."})
         serializer.save(todo_id=todo_id)
+
+
 
 class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TaskSerializer
@@ -43,7 +47,7 @@ class TaskRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
         return Task.objects.all()
 
 
-################################################################################################
+#################################################################################################
 
 
 class ImageListView(generics.ListCreateAPIView):
@@ -57,5 +61,3 @@ class ImageRetrieveUpdateDestroyView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ImageSerializer
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
-
-

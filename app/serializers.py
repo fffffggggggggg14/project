@@ -34,6 +34,10 @@ class TaskSerializer(serializers.ModelSerializer):
             Image.objects.create(task=instance, image=image)
         return instance
 
+
+###################################################################################################
+
+
 class TodoSerializer(serializers.ModelSerializer):
     tasks = TaskSerializer(many=True, read_only=True)
 
