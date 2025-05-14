@@ -18,8 +18,8 @@ class TaskSerializer(serializers.ModelSerializer):
         request = self.context.get('request')
         with transaction.atomic():
             task = Task.objects.create(**validated_data)
-            if 'condition':
-                transaction.set_rollback(True)
+            # if 'condition':
+            #     transaction.set_rollback(True)
             for image in request.FILES.getlist('images'):
                 Image.objects.create(task=task, image=image)
             return task
